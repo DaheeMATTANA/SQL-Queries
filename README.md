@@ -1,3 +1,3 @@
 # SQL-Queries
 
-SQL projects and queries
+SQL Projects and Queries
