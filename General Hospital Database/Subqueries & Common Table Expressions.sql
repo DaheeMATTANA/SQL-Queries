@@ -106,6 +106,16 @@ FROM (
 	) AS p
 WHERE p.name ILIKE 'm%';
 
+-- Using CTE
+WITH young_patients AS (
+	SELECT *
+	FROM patients
+	WHERE date_of_birth >= '2000-01-01'
+	)
+SELECT *
+FROM young_patients
+WHERE name ILIKE 'm%';
+
 
 -- 9) Selecting surgerys during the month of November 2016 and find the patient who is born after the year 1990
 SELECT p.master_patient_id, surgery_id, date_of_birth, surgical_admission_date
@@ -117,7 +127,8 @@ INNER JOIN (
 ON p.master_patient_id = s.master_patient_id
 WHERE date_of_birth >= '1990-01-01'
 ORDER BY surgical_admission_date
--- solution 2
+
+-- v2
 SELECT se.*
 FROM (
 	SELECT *	
@@ -130,15 +141,20 @@ INNER JOIN (
 	WHERE date_of_birth >= '1990-01-01'
 	) AS p
 ON se.master_patient_id = p.master_patient_id;
--- Using CTE (same result as the first query)
-WITH young_patients AS (
-	SELECT *
+
+-- v3
+WITH born_after_1990 AS (
+	SELECT 
+		master_patient_id,
+		date_of_birth
 	FROM patients
-	WHERE date_of_birth >= '2000-01-01'
+	WHERE date_of_birth >= '1990-01-01'
 	)
-SELECT *
-FROM young_patients
-WHERE name ILIKE 'm%';
+SELECT s.*
+FROM born_after_1990 p
+INNER JOIN surgical_encounters s
+ON p.master_patient_id = s.master_patient_id
+WHERE s.surgical_admission_date BETWEEN '2016-11-01' AND '2016-12-01';
 
 
 -- 10) Number of surgeries by county for counties where we have more than 1500 patients
