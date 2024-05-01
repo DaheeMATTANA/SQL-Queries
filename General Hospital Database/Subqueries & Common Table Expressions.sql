@@ -158,6 +158,22 @@ WHERE s.surgical_admission_date BETWEEN '2016-11-01' AND '2016-12-01';
 
 
 -- 10) Number of surgeries by county for counties where we have more than 1500 patients
+WITH county_1500_patients AS(
+	SELECT county
+	FROM patients 
+	GROUP BY county
+	HAVING COUNT(*) > 1500
+)
+SELECT
+	p.county,
+	COUNT(DISTINCT se.surgery_id) AS num_of_surgeries
+FROM patients p
+INNER JOIN surgical_encounters se
+ON p.master_patient_id = se.master_patient_id
+GROUP BY p.county
+HAVING p.county IN(SELECT county FROM county_1500_patients);
+
+-- Ver2
 WITH top_counties AS(
 	SELECT county,
 		   COUNT(*) AS n_patients
