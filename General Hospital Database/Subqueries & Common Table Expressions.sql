@@ -12,6 +12,21 @@ WHERE total_profit > ALL(
 	GROUP BY diagnosis_description
 );
 
+-- Different interpretation of the question (per diagnosis)
+WITH avg_cost_per_diag AS(
+	SELECT
+		diagnosis_description,
+		AVG(total_cost) AS avg_cost
+	FROM surgical_encounters
+	GROUP BY diagnosis_description
+	ORDER BY 1
+	)
+SELECT *
+FROM surgical_encounters se
+LEFT JOIN avg_cost_per_diag ac
+ON se.diagnosis_description = ac.diagnosis_description
+WHERE se.total_profit > ac.avg_cost;
+
 
 -- 2) Dignosis whose average length of stay is less than or equal to the average length of stay for all encounters by department
 SELECT diagnosis_description,
